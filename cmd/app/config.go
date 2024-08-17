@@ -3,10 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"os"
 )
 
 func loadConfig() {
-	viper.SetConfigName("application.yaml")
+	env := os.Getenv("ENV")
+	if len(env) == 0 {
+		env = "standalone"
+	}
+	viper.SetConfigName(fmt.Sprintf("application-%s.yaml", env))
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./resources")
 	err := viper.ReadInConfig()
