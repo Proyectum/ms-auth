@@ -1,0 +1,92 @@
+openapi: 3.0.0
+info:
+  title: Auth Management
+  version: 1.0.0
+  description: Auth Management endpoints
+  license:
+    name: MIT
+  x-go-package: "github.com/oapi-codegen/runtime"
+paths:
+  /v1/auth/sign-in:
+    post:
+      summary: Sign in
+      operationId: signIn
+      tags:
+        - auth
+      requestBody:
+        description: Sign in
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInRequest'
+      responses:
+        200:
+          description: 'Logged'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponse'
+        401:
+          description: 'Unauthorized'
+  /v1/auth/sign-up:
+    post:
+      summary: Sign up
+      operationId: signUp
+      tags:
+        - auth
+      requestBody:
+        description: Sign up
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    SignInRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          maxLength: 15
+          minLength: 5
+          example: 'jdoe'
+        password:
+          type: string
+          minLength: 5
+          maxLength: 25
+          example: 'jdoe@example.com'
+    SignInResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "jwt token"
+    SignUpRequest:
+      type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+          maxLength: 15
+          minLength: 5
+          example: 'jdoe'
+        email:
+          type: string
+          format: email
+          example: 'jdoe@example.com'
+        password:
+          type: string
+          minLength: 5
+          maxLength: 25
+          example: "my-super-password"
