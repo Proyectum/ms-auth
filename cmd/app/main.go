@@ -12,6 +12,7 @@ import (
 
 func main() {
 	loadConfig()
+	executeMigrations()
 	r := gin.Default()
 	r.GET("/ping", ping())
 	routes.RegisterRoutes(r)

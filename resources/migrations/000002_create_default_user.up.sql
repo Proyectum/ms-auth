@@ -1,0 +1,2 @@
+INSERT INTO users (id, username, password, email, created_at, updated_at)
+values ('b4449fde-4b08-477a-8259-ff7f59a54b36','admin','$2a$06$jk8y/t0TFYFkx87dRr.TCONZoGHcLhGXfrfO6kCxgU97QqtQOJxWS','admin@proyectum.com','2024-08-17 19:45:06.284273 +00:00','2024-08-17 19:45:06.284274 +00:00')
