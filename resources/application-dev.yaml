@@ -1,0 +1,24 @@
+app:
+  name: ms-auth
+  profiles: standalone
+
+security:
+  jwt:
+    secret: my-super-secret
+    expiration: 24 # hours
+  password:
+    cost: 6
+
+data:
+  datasource:
+    postgres:
+      host: auths-postgres
+      port: 5432
+      user: postgres
+      password: postgres
+      database: auths
+
+server:
+  port: 8080
+  read-timeout: 10
+  write-timeout: 10

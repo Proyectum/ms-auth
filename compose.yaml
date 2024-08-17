@@ -2,7 +2,7 @@ services:
   postgres:
     image: 'postgres:12'
     environment:
-      - 'POSTGRES_DB=auth'
+      - 'POSTGRES_DB=auths'
       - 'POSTGRES_PASSWORD=password'
       - 'POSTGRES_USER=admin'
     ports:

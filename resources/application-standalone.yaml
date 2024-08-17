@@ -16,7 +16,7 @@ data:
       port: 5432
       user: admin
       password: password
-      database: auth
+      database: auths
 
 server:
   port: 8080
