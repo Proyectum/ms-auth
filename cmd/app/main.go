@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	routes "github.com/proyectum/ms-auth/internal/adapters/in/http"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 	"time"
 )
@@ -11,20 +13,29 @@ import (
 func main() {
 	loadConfig()
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	r.GET("/ping", ping())
+	routes.RegisterRoutes(r)
+	s := createServer(r)
+	log.Fatal(s.ListenAndServe())
+}
+
+func createServer(r *gin.Engine) *http.Server {
 	port := viper.GetInt32("server.port")
 	readTimeout := viper.GetDuration("server.read-timeout")
 	writeTimeout := viper.GetDuration("server.write-timeout")
-	s := &http.Server{
+	return &http.Server{
 		Addr:           fmt.Sprintf(":%d", port),
 		Handler:        r,
 		ReadTimeout:    readTimeout * time.Second,
 		WriteTimeout:   writeTimeout * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe()
+}
+
+func ping() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	}
 }
