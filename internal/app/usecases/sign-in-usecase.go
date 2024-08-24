@@ -47,7 +47,7 @@ func (s *signInUseCaseImpl) SignIn(username, password string) (*entities.SignInU
 }
 
 func (s *signInUseCaseImpl) getSignInUser(user *entities.User) (*entities.SignInUser, error) {
-	token, err := s.jwtService.GetToken(user.Username)
+	token, err := s.jwtService.GetToken(user)
 
 	if err != nil {
 		log.Printf("error %v\n", err)
