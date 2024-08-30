@@ -1,10 +1,10 @@
 app:
   name: ms-auth
-  profiles: standalone
+  environment: ${ENV}
 
 security:
   jwt:
-    secret: my-super-secret
+    secret: ${JWT_SECRET}
     expiration: 24 # hours
   password:
     cost: 6
@@ -12,10 +12,10 @@ security:
 data:
   datasource:
     postgres:
-      host: auths-postgres
-      port: 5432
-      user: postgres
-      password: postgres
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
       database: auths
 
 server:
