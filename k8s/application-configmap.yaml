@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-auth
+data:
+  PS_HOST: "postgres"
+  PS_PORT: "5432"

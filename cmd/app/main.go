@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	routes "github.com/proyectum/ms-auth/internal/adapters/in/http"
-	"github.com/spf13/viper"
+	"github.com/proyectum/ms-auth/internal/boot"
 	"log"
 	"net/http"
 	"time"
 )
 
 func main() {
-	loadConfig()
-	executeMigrations()
+	boot.LoadConfig()
+	boot.ExecuteMigrations()
 	r := gin.Default()
 	r.GET("/ping", ping())
 	routes.RegisterRoutes(r)
@@ -21,14 +21,12 @@ func main() {
 }
 
 func createServer(r *gin.Engine) *http.Server {
-	port := viper.GetInt32("server.port")
-	readTimeout := viper.GetDuration("server.read-timeout")
-	writeTimeout := viper.GetDuration("server.write-timeout")
+	srvConf := boot.CONFIG.Server
 	return &http.Server{
-		Addr:           fmt.Sprintf(":%d", port),
+		Addr:           fmt.Sprintf(":%d", srvConf.Port),
 		Handler:        r,
-		ReadTimeout:    readTimeout * time.Second,
-		WriteTimeout:   writeTimeout * time.Second,
+		ReadTimeout:    srvConf.ReadTimeout * time.Second,
+		WriteTimeout:   srvConf.WriteTimeout * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 }

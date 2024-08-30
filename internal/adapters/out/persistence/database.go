@@ -2,10 +2,9 @@ package persistence
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
+	"github.com/proyectum/ms-auth/internal/boot"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 	"sync"
 )
 
@@ -17,17 +16,14 @@ var (
 func getDatasource() *gorm.DB {
 
 	dbOnce.Do(func() {
-		dbUser := viper.GetString("data.datasource.postgres.user")
-		host := viper.GetString("data.datasource.postgres.host")
-		dbPass := viper.GetString("data.datasource.postgres.password")
-		dbName := viper.GetString("data.datasource.postgres.database")
-		port := viper.GetInt("data.datasource.postgres.port")
+		databaseConf := boot.CONFIG.Data.Datasource.Postgres
 
-		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=UTC", host, dbUser, dbPass, dbName, port)
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=UTC",
+			databaseConf.Host, databaseConf.User, databaseConf.Password, databaseConf.Database, databaseConf.Port)
 		var err error
 		dbInstance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
-			log.Fatal("failed to connect database")
+			panic(fmt.Errorf("failed to connect database %w", err))
 		}
 	})
 
