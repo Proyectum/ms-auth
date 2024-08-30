@@ -7,7 +7,7 @@ info:
     name: MIT
   x-go-package: "github.com/oapi-codegen/runtime"
 paths:
-  /v1/auth/sign-in:
+  /api/v1/auth/sign-in:
     post:
       summary: Sign in
       operationId: signIn
@@ -29,7 +29,7 @@ paths:
                 $ref: '#/components/schemas/SignInResponse'
         401:
           description: 'Unauthorized'
-  /v1/auth/sign-up:
+  /api/v1/auth/sign-up:
     post:
       summary: Sign up
       operationId: signUp
