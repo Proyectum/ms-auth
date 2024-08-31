@@ -45,6 +45,35 @@ paths:
       responses:
         '201':
           description: Created
+  /api/v1/auth/validation:
+    get:
+      summary: Validation
+      operationId: validation
+      tags:
+        - auth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Success
+          headers:
+            X-Auth-User:
+              schema:
+                type: string
+              description: User logged
+            X-Auth-Email:
+              schema:
+                type: string
+                format: email
+            X-Auth-Scopes:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
 components:
   schemas:
     SignInRequest:
@@ -90,3 +119,8 @@ components:
           minLength: 5
           maxLength: 25
           example: "my-super-password"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

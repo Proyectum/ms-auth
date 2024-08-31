@@ -5,51 +5,79 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/proyectum/ms-auth/internal/adapters/in/http/api"
 	appUseCases "github.com/proyectum/ms-auth/internal/app/usecases"
+	"github.com/proyectum/ms-auth/internal/domain/entities"
 	domainErrors "github.com/proyectum/ms-auth/internal/domain/errors"
 	"github.com/proyectum/ms-auth/internal/domain/usecases"
 	"net/http"
+	"strings"
 )
 
+const authHeader = "Authorization"
+const bearerPrefix = "Bearer"
+const space = " "
+
 type authRoutes struct {
-	signUpUseCase usecases.SignUpUseCase
-	signInUseCase usecases.SignInUseCase
+	signUpUseCase     usecases.SignUpUseCase
+	signInUseCase     usecases.SignInUseCase
+	validationUseCase usecases.ValidationUseCase
 }
 
 func RegisterRoutes(r *gin.Engine) {
 	api.RegisterHandlers(r, &authRoutes{
-		signUpUseCase: appUseCases.NewSignUpUseCase(),
-		signInUseCase: appUseCases.NewSignInUseCase(),
+		signUpUseCase:     appUseCases.NewSignUpUseCase(),
+		signInUseCase:     appUseCases.NewSignInUseCase(),
+		validationUseCase: appUseCases.NewValidationUseCase(),
 	})
 }
 
-func (ar *authRoutes) SignUp(c *gin.Context) {
+func (r *authRoutes) Validation(c *gin.Context) {
+	token := r.getToken(c)
+
+	if c.IsAborted() {
+		return
+	}
+
+	validation := r.validationUseCase.Validate(token)
+
+	if validation.Status != entities.AuthGranted {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
+
+	c.Header("X-Auth-User", validation.Username)
+	c.Header("X-Auth-Email", validation.Email)
+	c.Header("X-Auth-Scopes", validation.JoinScopes())
+	c.Status(http.StatusOK)
+}
+
+func (r *authRoutes) SignUp(c *gin.Context) {
 	var request api.SignUpRequest
 	if err := c.Bind(&request); err != nil {
 		handleBadRequestError(err, c)
 		return
 	}
 
-	err := ar.signUpUseCase.SignUp(request.Username, request.Password, string(request.Email))
+	err := r.signUpUseCase.SignUp(request.Username, request.Password, string(request.Email))
 
 	if err != nil {
-		ar.handleError(c, err)
+		r.handleError(c, err)
 		return
 	}
 
 	c.Status(http.StatusCreated)
 }
 
-func (ar *authRoutes) SignIn(c *gin.Context) {
+func (r *authRoutes) SignIn(c *gin.Context) {
 	var request api.SignInRequest
 	if err := c.Bind(&request); err != nil {
 		handleBadRequestError(err, c)
 		return
 	}
 
-	signIn, err := ar.signInUseCase.SignIn(request.Username, request.Password)
+	signIn, err := r.signInUseCase.SignIn(request.Username, request.Password)
 
 	if err != nil {
-		ar.handleError(c, err)
+		r.handleError(c, err)
 		return
 	}
 
@@ -58,7 +86,7 @@ func (ar *authRoutes) SignIn(c *gin.Context) {
 	})
 }
 
-func (ar *authRoutes) handleError(c *gin.Context, err error) {
+func (r *authRoutes) handleError(c *gin.Context, err error) {
 	if errors.Is(err, &domainErrors.InvalidUsernameError{}) ||
 		errors.Is(err, &domainErrors.InvalidPasswordError{}) ||
 		errors.Is(err, &domainErrors.InvalidEmailError{}) {
@@ -77,6 +105,25 @@ func (ar *authRoutes) handleError(c *gin.Context, err error) {
 	}
 
 	handleInternalError(err, c)
+}
+
+func (r *authRoutes) getToken(c *gin.Context) string {
+	header := c.GetHeader(authHeader)
+
+	if len(header) == 0 {
+		c.Status(http.StatusUnauthorized)
+		c.Abort()
+		return ""
+	}
+
+	parts := strings.Split(header, space)
+	if len(parts) != 2 || parts[0] != bearerPrefix {
+		c.Status(http.StatusUnauthorized)
+		c.Abort()
+		return ""
+	}
+
+	return parts[1]
 }
 
 func handleUnauthorizedError(err error, c *gin.Context) {

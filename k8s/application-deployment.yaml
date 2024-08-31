@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ms-auth
-          image: ghcr.io/proyectum/ms-auth:1.0.4
+          image: ghcr.io/proyectum/ms-auth:1.0.5
           ports:
             - containerPort: 8080
           resources:

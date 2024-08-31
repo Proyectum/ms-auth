@@ -14,10 +14,3 @@ spec:
                 name: ms-auth
                 port:
                   number: 8080
-          - path: /api/v1/roles
-            pathType: Prefix
-            backend:
-              service:
-                name: ms-auth
-                port:
-                  number: 8080
