@@ -22,5 +22,4 @@ RUN chmod +x ./application
 
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
 CMD ["./application"]
